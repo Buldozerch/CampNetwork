@@ -130,7 +130,10 @@ async def process_wallet(wallet: User):
                 twitter_follow_tasks.append(account_name)
     
     # Считаем общее количество всех заданий
-    total_tasks = len(incomplete_quests) + len(twitter_follow_tasks)
+    if settings.twitter_enabled:
+        total_tasks = len(incomplete_quests) + len(twitter_follow_tasks)
+    else:
+        total_tasks = len(incomplete_quests)
     
     if total_tasks == 0:
         logger.success(f"{wallet} все задания уже выполнены")
