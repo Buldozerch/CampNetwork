@@ -34,6 +34,8 @@ class QuestClient(BaseHttpClient):
         "RewardedTv": "d7a3a18b-38fd-45d5-937a-f974dff403bd",
         "Kraft": "f4de4fa8-ad5c-45c9-a804-0483309de9f9",
         "Hitmakr": "afac07d2-6c0e-42ae-9dd8-1fff68ca6a49",
+        "SummitXDis": "3dfca204-edf2-461a-8fda-4067b09241a7",
+        "SummitXTG": "861e2917-3725-48ba-b8b9-4466cd81fe72"
     }
     
     # URL для запросов

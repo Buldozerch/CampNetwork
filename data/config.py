@@ -48,6 +48,8 @@ ACTUAL_FOLLOWS_TWITTER = [
                         "JukebloxDapp",
                         "campnetworkxyz",
                         "hitmakrr",
+                        "merv_wtf",
+                        "merv_toon",
     
 ]
 

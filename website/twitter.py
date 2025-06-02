@@ -46,6 +46,8 @@ class TwitterClient(BaseHttpClient):
             "JukebloxDapp": "02e3d5b3-e65e-41c8-b159-405f48255cdf",
             "campnetworkxyz": "2660f24a-e3ac-4093-8c16-7ae718c00731",
             "hitmakrr": "dfa110a8-4079-4309-a023-e0c9077ace5e",
+            "merv_wtf": "e71a8c69-36b3-46fb-9a26-b6e0d4757d1d",
+            "merv_toon": "0bb973c0-fa9d-4779-829d-ef18a8fbd3b0"
         }
     }
 
