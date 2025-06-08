@@ -52,7 +52,7 @@ class AuthClient(BaseHttpClient):
             # Проверяем наличие Cloudflare защиты
             
             success, response = await self.request(
-                url=f"{self.BASE_URL}/home",
+                url=f"{self.BASE_URL}",
                 method="GET",
                 check_cloudflare=True  # Включаем автоматическую проверку и обработку Cloudflare
             )

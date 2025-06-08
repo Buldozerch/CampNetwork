@@ -84,7 +84,7 @@ class CloudflareHandler:
                 "clientKey": CAPMONSTER_API_KEY,
                 "task": {
                     "type": "TurnstileTask",
-                    "websiteURL": "https://loyalty.campnetwork.xyz/home",
+                    "websiteURL": "https://loyalty.campnetwork.xyz",
                     "websiteKey": "0x4AAAAAAADnPIDROrmt1Wwj",
                     "cloudflareTaskType": "cf_clearance",  # Нужен cf_clearance cookie
                     "htmlPageBase64": html_base64,
