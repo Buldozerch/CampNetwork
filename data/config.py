@@ -27,7 +27,7 @@ SETTINGS_FILE = os.path.join(FILES_DIR, 'settings.json')
 ACTUAL_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
 ACTUAL_FOLLOWS_TWITTER = [
                         "StoryChain_ai",
-                        "tokentails",
+                        # "tokentails",
                         "PanenkaFC90",
                         "ScorePlay_xyz",
                         "wideworlds_ai",

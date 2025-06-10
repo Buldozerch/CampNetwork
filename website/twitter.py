@@ -25,7 +25,7 @@ class TwitterClient(BaseHttpClient):
     TWITTER_QUESTS_MAP = {
         "Follow": {
             "StoryChain_ai": "4cebe3ff-4dae-4858-9323-8b669d80e45c",
-            "tokentails": "cf5a23b1-d48c-4ab9-a74c-785394158224",
+            # "tokentails": "cf5a23b1-d48c-4ab9-a74c-785394158224",
             "PanenkaFC90": "040ead29-7436-4457-b7cd-8bd2a8855a49",
             "ScorePlay_xyz": "5f03c7d8-8ee0-443f-a0ad-8fda68dfecd8",
             "wideworlds_ai": "42936f26-3ec6-401f-8ed0-62af343f1fc4",

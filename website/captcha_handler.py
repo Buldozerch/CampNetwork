@@ -7,6 +7,7 @@ from typing import Dict, Optional, Tuple, Union
 from loguru import logger
 from urllib.parse import urlparse
 from data.config import CAPMONSTER_API_KEY, ACTUAL_UA
+from data.models import Settings
 
 
 class CloudflareHandler:
@@ -107,10 +108,12 @@ class CloudflareHandler:
                     })
                     
             # Создаем новую сессию
+            settings = Settings()
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     url='https://api.capmonster.cloud/createTask',
-                    json=json_data
+                    json=json_data,
+                    ssl=True if settings.get_use_ssl() else False
                 ) as resp:
                     if resp.status == 200:
                         result = await resp.text()
@@ -147,12 +150,14 @@ class CloudflareHandler:
         # Максимальное время ожидания (60 секунд)
         max_attempts = 60
         
+        settings = Settings()
         for i in range(max_attempts):
             try:
                 async with aiohttp.ClientSession() as session:
                     async with session.post(
                         url='https://api.capmonster.cloud/getTaskResult',
-                        json=json_data
+                        json=json_data,
+                        ssl=True if settings.get_use_ssl() else False
                     ) as resp:
                         if resp.status == 200:
                             result = await resp.text()

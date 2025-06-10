@@ -5,6 +5,7 @@ from data.config import SETTINGS_FILE, ACTUAL_FOLLOWS_TWITTER
 class Settings(Singleton, AutoRepr):
     def __init__(self):
         json_data = read_json(path=SETTINGS_FILE)
+        self.use_ssl = json_data.get("use_ssl", True)
         self.twitter_enabled = json_data.get('twitter', {}).get('enabled', True)
         
         self.twitter_delay_actions_min = json_data.get('twitter', {}).get('delay_between_actions', {}).get('min', 60)
@@ -33,6 +34,9 @@ class Settings(Singleton, AutoRepr):
         self.resources_auto_replace = json_data.get('resources', {}).get('auto_replace', True)
         self.resources_max_failures = json_data.get('resources', {}).get('max_failures', 3)
     
+    def get_use_ssl(self):
+        return self.use_ssl
+
     def get_twitter_action_delay(self) -> tuple:
         """Возвращает диапазон задержки между действиями в Twitter"""
         return self.twitter_delay_actions_min, self.twitter_delay_actions_max

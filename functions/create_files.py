@@ -39,6 +39,7 @@ def create_files():
         current_settings = {}
 
     settings = {
+        "use_ssl": True,
         # Twitter настройки
         "twitter": {
             "enabled": True,
