@@ -1,4 +1,5 @@
 from typing import Dict, List, Optional, Any
+import random
 from loguru import logger
 from utils.db_api_async.models import User
 from libs.eth_async.client import Client
@@ -50,7 +51,7 @@ class CampNetworkClient:
             # Если указано использовать только коды из файла
             if use_only_file_codes:
                 file_codes = load_ref_codes()
-                referral_code = file_codes[0] if file_codes else None
+                referral_code = random.choice(file_codes) if file_codes else None
             else:
                 # Используем стандартную логику выбора кода
                 referral_code = await get_referral_code_for_registration(use_random_from_db=use_random_from_db)
