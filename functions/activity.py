@@ -2,12 +2,14 @@ import os
 from loguru import logger
 import random
 import asyncio
+from datetime import datetime
 from website import auth_client
 from website.camp_client import CampNetworkClient
 from typing import List, Tuple
 from website.twitter import TwitterClient
 from website.quest_client import QuestClient
 from website.resource_manager import ResourceManager
+from tasks.faucet import Faucet, FaucetError, CaptchaUnsolvableError, RateLimitError
 from libs.eth_async.client import Client
 from libs.eth_async.utils.utils import parse_proxy
 from libs.eth_async.data.models import Networks
@@ -15,7 +17,7 @@ from utils.db_api_async.db_api import Session
 from utils.db_api_async.models import User
 from utils.db_api_async.db_activity import DB
 from data import config
-from data.config import ACTUAL_FOLLOWS_TWITTER, ACTUAL_UA
+from data.config import ACTUAL_FOLLOWS_TWITTER, ACTUAL_UA, SOLVECAPTCHA_API_KEY
 from data.models import Settings
 
 settings = Settings()
@@ -1307,6 +1309,158 @@ async def process_wallet_with_specific_quests(
         logger.error(f"{wallet} исчерпаны все {max_retries} попытки с заменой прокси")
 
     return False
+
+
+async def handle_faucet(user: User, make_delay: bool = False):
+    settings = Settings()
+    if make_delay:
+        startup_min, startup_max = settings.get_wallet_startup_delay()
+        delay = random.uniform(startup_min, startup_max)
+        logger.info(f"Запуск кошелька {user} через {int(delay)} сек.")
+        await asyncio.sleep(delay)
+
+    client = Client(
+        private_key=user.private_key,
+        network=Networks.Ethereum,
+        proxy=user.proxy,
+        check_proxy=False,
+    )
+
+    resource_manager = ResourceManager()
+    proxy_errors = 0
+    auto_replace, max_failures = settings.get_resource_settings()
+    nonce = 0
+    for _ in range(max_failures):
+        try:
+            nonce = await client.wallet.nonce()
+            break
+        except Exception as e:
+            if "proxy" in str(e).lower() or "connection" in str(e).lower():
+                proxy_errors += 1
+                logger.warning(f"{user} возможно проблема с прокси")
+
+                # Добавляем задержку после ошибки
+                error_delay = random.uniform(2, 3)
+                logger.info(f"{user} задержка {error_delay:.1f} сек. после ошибки")
+                await asyncio.sleep(error_delay)
+
+                # Если достигнут порог ошибок, отмечаем прокси как плохое
+                if proxy_errors >= 3:
+                    await resource_manager.mark_proxy_as_bad(user.id)
+
+                    # Если включена автозамена, пробуем заменить прокси
+                    if auto_replace:
+                        success, message = await resource_manager.replace_proxy(user.id)
+                        if success:
+                            logger.info(
+                                f"{user} прокси заменено: {message}, пробуем снова..."
+                            )
+                            continue  # Пробуем снова с новым прокси
+                        else:
+                            logger.error(
+                                f"{user} не удалось заменить прокси: {message}"
+                            )
+                            return False
+
+    if not SOLVECAPTCHA_API_KEY:
+        logger.error(f"{user} put SolveCaptcha Api Key in .env file")
+        return False
+    if nonce < 3:
+        return False
+    if (
+        user.faucet_last_claim
+        and (datetime.utcnow() - user.faucet_last_claim).total_seconds() < 24 * 60 * 60
+    ):
+        logger.warning(f"{user} already claimed faucet in last 24 hours")
+        return False
+
+    faucet = Faucet(user=user, api_key=SOLVECAPTCHA_API_KEY)
+    for _ in range(10):
+        try:
+            claim = await faucet.claim_tokens()
+            if claim:
+                async with Session() as session:
+                    db = DB(session=session)
+                    await db.update_last_faucet_claim(user_id=user.id)
+                return True
+        except RateLimitError:
+            logger.warning(f"{user} already claim faucet in last 24 hours")
+            async with Session() as session:
+                db = DB(session=session)
+                await db.update_last_faucet_claim(user_id=user.id)
+            return False
+        except CaptchaUnsolvableError:
+            logger.warning(f"{user} get capctha unsolvable try again")
+            continue
+        except FaucetError as e:
+            logger.error(f"{user} have error with Faucet claim try again {_}/10 {e}")
+
+            # Проверяем, связана ли проблема с прокси
+            logger.error(f"{user} have error with Faucet claim try again {_}/10 {e}")
+            continue
+        except Exception as e:
+            logger.error(f"{user} have unknown error with Faucet {e}")
+            return False
+
+
+async def all_faucet_claim():
+    try:
+        # Получаем список кошельков из базы данных
+        async with Session() as session:
+            db = DB(session=session)
+            all_wallets = await db.get_all_wallets()
+
+        if not all_wallets:
+            logger.error("Нет кошельков в базе данных. Сначала импортируйте кошельки.")
+            return
+
+        # Определяем диапазон кошельков для обработки из настроек
+        wallet_start, wallet_end = settings.get_wallet_range()
+        if wallet_end > 0 and wallet_end <= len(all_wallets):
+            wallets = all_wallets[wallet_start:wallet_end]
+        else:
+            wallets = all_wallets[wallet_start:]
+
+        # Отображаем информацию о количестве кошельков для обработки
+        logger.info(f"Найдено {len(all_wallets)} кошельков")
+        logger.info(
+            f"Будет обработано {len(wallets)} кошельков (с {wallet_start + 1} по {wallet_start + len(wallets)})"
+        )
+
+        # Перемешиваем кошельки для рандомизации порядка
+        random.shuffle(wallets)
+
+        # Получаем настройки задержки между запуском аккаунтов
+
+        # Создаем задачи для всех кошельков
+        tasks = []
+        for i, wallet in enumerate(wallets):
+            # Добавляем случайную задержку между запуском обработки кошельков
+
+            # Создаем задачу для обработки кошелька
+            task = asyncio.create_task(handle_faucet(wallet, make_delay=True))
+            tasks.append(task)
+
+        # Если нет задач, выходим
+        if not tasks:
+            logger.warning("Нет кошельков для обработки")
+            return
+
+        # Запускаем все задачи
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Анализируем результаты
+        success_count = sum(1 for result in results if result is True)
+        error_count = sum(
+            1 for result in results if isinstance(result, Exception) or result is False
+        )
+
+        logger.info(
+            f"Обработка завершена: успешно {success_count}, с ошибками {error_count}"
+        )
+
+    except Exception as e:
+        logger.error(f"Ошибка при выполнении заданий для всех кошельков: {str(e)}")
 
 
 async def complete_all_wallets_quests():

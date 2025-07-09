@@ -1,6 +1,7 @@
 from .models import User
 import random
 import json
+from datetime import datetime
 from sqlalchemy import select, update, text
 from libs.eth_async.utils.utils import parse_proxy
 
@@ -175,6 +176,16 @@ class DB:
             return []
 
     # --- Добавляем новые функции для управления ресурсами ---
+
+    async def update_last_faucet_claim(self, user_id: int) -> bool:
+        try:
+            user = await self.session.get(User, user_id)
+            if not user:
+                return False
+            user.faucet_last_claim = datetime.utcnow()
+            return True
+        except Exception as e:
+            return False
 
     async def mark_account_as_blocked(self, user_id: int) -> bool:
         try:

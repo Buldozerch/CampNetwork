@@ -6,6 +6,7 @@ from functions.activity import (
     get_wallets_stats,
     complete_specific_quests,
     check_all_wallets_blocked,
+    all_faucet_claim,
 )
 
 from utils.db_api_async.db_api import Session
@@ -652,7 +653,8 @@ def print_menu():
     menu.add_row("6)", "Управление реферальными кодами")  # Новый пункт меню
     menu.add_row("7)", "Настройки")
     menu.add_row("8)", "Проверить кошельки на блокировку")
-    menu.add_row("9)", "Выход")
+    menu.add_row("9)", "Выполнить Faucet")
+    menu.add_row("10)", "Выход")
 
     console.print(menu)
 
@@ -736,11 +738,14 @@ async def main():
                 sys.exit(0)
 
             elif action == "8":
-                # Выход
                 await check_all_wallets_blocked()
                 sys.exit(0)
 
             elif action == "9":
+                await all_faucet_claim()
+                sys.exit(0)
+
+            elif action == "10":
                 # Выход
                 console.print("\n[bold cyan]Выход из программы[/]")
                 sys.exit(0)

@@ -40,7 +40,7 @@ async def check_and_migrate_db():
         has_alembic_version = inspector.has_table("alembic_version")
 
         # Проверяем наличие столбцов ref_code и account_blocked в таблице campnetwork
-        required_columns = ["ref_code", "account_blocked"]
+        required_columns = ["ref_code", "account_blocked", "faucet_last_claim"]
         if inspector.has_table("campnetwork"):
             columns = [col["name"] for col in inspector.get_columns("campnetwork")]
             missing_columns = [col for col in required_columns if col not in columns]
@@ -78,7 +78,7 @@ async def check_and_migrate_db():
             logger.info("База данных уже на последней версии миграции.")
             if all_columns_present:
                 logger.success(
-                    "Все требуемые столбцы (ref_code, account_blocked) присутствуют, всё в порядке."
+                    "Все требуемые столбцы (ref_code, account_blocked, faucet_last_claim) присутствуют, всё в порядке."
                 )
                 return True
             else:

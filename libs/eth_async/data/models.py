@@ -17,95 +17,108 @@ class TokenAmount:
     Ether: Decimal
     decimals: int
 
-    def __init__(self, amount: int | float | str | Decimal, decimals: int = 18, wei: bool = False) -> None:
+    def __init__(
+        self, amount: int | float | str | Decimal, decimals: int = 18, wei: bool = False
+    ) -> None:
         if wei:
             self.Wei: int = int(amount)
-            self.Ether: Decimal = Decimal(str(amount)) / 10 ** decimals
+            self.Ether: Decimal = Decimal(str(amount)) / 10**decimals
 
         else:
-            self.Wei: int = int(Decimal(str(amount)) * 10 ** decimals)
+            self.Wei: int = int(Decimal(str(amount)) * 10**decimals)
             self.Ether: Decimal = Decimal(str(amount))
 
         self.decimals = decimals
 
     def __str__(self):
-        return f'{self.Wei}'
+        return f"{self.Wei}"
 
 
 @dataclass
 class DefaultABIs:
     Token = [
         {
-            'constant': True,
-            'inputs': [],
-            'name': 'name',
-            'outputs': [{'name': '', 'type': 'string'}],
-            'payable': False,
-            'stateMutability': 'view',
-            'type': 'function'
+            "constant": True,
+            "inputs": [],
+            "name": "name",
+            "outputs": [{"name": "", "type": "string"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
         },
         {
-            'constant': True,
-            'inputs': [],
-            'name': 'symbol',
-            'outputs': [{'name': '', 'type': 'string'}],
-            'payable': False,
-            'stateMutability': 'view',
-            'type': 'function'
+            "constant": True,
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [{"name": "", "type": "string"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
         },
         {
-            'constant': True,
-            'inputs': [],
-            'name': 'totalSupply',
-            'outputs': [{'name': '', 'type': 'uint256'}],
-            'payable': False,
-            'stateMutability': 'view',
-            'type': 'function'
+            "constant": True,
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [{"name": "", "type": "uint256"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
         },
         {
-            'constant': True,
-            'inputs': [],
-            'name': 'decimals',
-            'outputs': [{'name': '', 'type': 'uint256'}],
-            'payable': False,
-            'stateMutability': 'view',
-            'type': 'function'
+            "constant": True,
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [{"name": "", "type": "uint256"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
         },
         {
-            'constant': True,
-            'inputs': [{'name': 'account', 'type': 'address'}],
-            'name': 'balanceOf',
-            'outputs': [{'name': '', 'type': 'uint256'}],
-            'payable': False,
-            'stateMutability': 'view',
-            'type': 'function'
+            "constant": True,
+            "inputs": [{"name": "account", "type": "address"}],
+            "name": "balanceOf",
+            "outputs": [{"name": "", "type": "uint256"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
         },
         {
-            'constant': True,
-            'inputs': [{'name': 'owner', 'type': 'address'}, {'name': 'spender', 'type': 'address'}],
-            'name': 'allowance',
-            'outputs': [{'name': 'remaining', 'type': 'uint256'}],
-            'payable': False,
-            'stateMutability': 'view',
-            'type': 'function'
+            "constant": True,
+            "inputs": [
+                {"name": "owner", "type": "address"},
+                {"name": "spender", "type": "address"},
+            ],
+            "name": "allowance",
+            "outputs": [{"name": "remaining", "type": "uint256"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
         },
         {
-            'constant': False,
-            'inputs': [{'name': 'spender', 'type': 'address'}, {'name': 'value', 'type': 'uint256'}],
-            'name': 'approve',
-            'outputs': [],
-            'payable': False,
-            'stateMutability': 'nonpayable',
-            'type': 'function'
+            "constant": False,
+            "inputs": [
+                {"name": "spender", "type": "address"},
+                {"name": "value", "type": "uint256"},
+            ],
+            "name": "approve",
+            "outputs": [],
+            "payable": False,
+            "stateMutability": "nonpayable",
+            "type": "function",
         },
         {
-            'constant': False,
-            'inputs': [{'name': 'to', 'type': 'address'}, {'name': 'value', 'type': 'uint256'}],
-            'name': 'transfer',
-            'outputs': [], 'payable': False,
-            'stateMutability': 'nonpayable',
-            'type': 'function'
-        }]
+            "constant": False,
+            "inputs": [
+                {"name": "to", "type": "address"},
+                {"name": "value", "type": "uint256"},
+            ],
+            "name": "transfer",
+            "outputs": [],
+            "payable": False,
+            "stateMutability": "nonpayable",
+            "type": "function",
+        },
+    ]
 
 
 @dataclass
@@ -120,6 +133,7 @@ class API:
         functions (Optional[APIFunctions]): the functions instance.
 
     """
+
     key: str
     url: str
     docs: str | None = None
@@ -128,15 +142,15 @@ class API:
 
 class Network:
     def __init__(
-            self,
-            name: str,
-            rpc: str,
-            decimals: int | None = None,
-            chain_id: int | None = None,
-            tx_type: int = 0,
-            coin_symbol: str | None = None,
-            explorer: str | None = None,
-            api: API | None = None,
+        self,
+        name: str,
+        rpc: str,
+        decimals: int | None = None,
+        chain_id: int | None = None,
+        tx_type: int = 0,
+        coin_symbol: str | None = None,
+        explorer: str | None = None,
+        api: API | None = None,
     ) -> None:
         self.name: str = name.lower()
         self.rpc: str = rpc
@@ -152,24 +166,26 @@ class Network:
             try:
                 self.chain_id = Web3(Web3.HTTPProvider(self.rpc)).eth.chain_id
             except Exception as err:
-                raise exceptions.WrongChainID(f'Can not get chain id: {err}')
+                raise exceptions.WrongChainID(f"Can not get chain id: {err}")
 
         if not self.coin_symbol or not self.decimals:
             try:
                 network = None
-                networks_info_response = requests.get('https://chainid.network/chains.json').json()
+                networks_info_response = requests.get(
+                    "https://chainid.network/chains.json"
+                ).json()
                 for network_ in networks_info_response:
-                    if network_['chainId'] == self.chain_id:
+                    if network_["chainId"] == self.chain_id:
                         network = network_
                         break
 
                 if not self.coin_symbol:
-                    self.coin_symbol = network['nativeCurrency']['symbol']
+                    self.coin_symbol = network["nativeCurrency"]["symbol"]
                 if not self.decimals:
-                    self.decimals = int(network['nativeCurrency']['decimals'])
+                    self.decimals = int(network["nativeCurrency"]["decimals"])
 
             except Exception as err:
-                raise exceptions.WrongCoinSymbol(f'Can not get coin symbol: {err}')
+                raise exceptions.WrongCoinSymbol(f"Can not get coin symbol: {err}")
 
         if self.coin_symbol:
             self.coin_symbol = self.coin_symbol.upper()
@@ -187,184 +203,225 @@ class Network:
 class Networks:
     # Mainnets
     Ethereum = Network(
-        name='ethereum',
-        rpc='https://rpc.ankr.com/eth/',
+        name="ethereum",
+        rpc="https://eth.drpc.org",
         chain_id=1,
         tx_type=2,
-        coin_symbol='ETH',
+        coin_symbol="ETH",
         decimals=18,
-        explorer='https://etherscan.io/',
-        api=API(key=config.ETHEREUM_API_KEY, url='https://api.etherscan.io/api', docs='https://docs.etherscan.io/'),
+        explorer="https://etherscan.io/",
+        api=API(
+            key=config.ETHEREUM_API_KEY,
+            url="https://api.etherscan.io/api",
+            docs="https://docs.etherscan.io/",
+        ),
     )
 
     Arbitrum = Network(
-        name='arbitrum',
-        rpc='https://rpc.ankr.com/arbitrum/',
+        name="arbitrum",
+        rpc="https://rpc.ankr.com/arbitrum/",
         chain_id=42161,
         tx_type=2,
-        coin_symbol='ETH',
+        coin_symbol="ETH",
         decimals=18,
-        explorer='https://arbiscan.io/',
-        api=API(key=config.ARBITRUM_API_KEY, url='https://api.arbiscan.io/api', docs='https://docs.arbiscan.io/'),
+        explorer="https://arbiscan.io/",
+        api=API(
+            key=config.ARBITRUM_API_KEY,
+            url="https://api.arbiscan.io/api",
+            docs="https://docs.arbiscan.io/",
+        ),
     )
 
     ArbitrumNova = Network(
-        name='arbitrum_nova',
-        rpc='https://nova.arbitrum.io/rpc/',
+        name="arbitrum_nova",
+        rpc="https://nova.arbitrum.io/rpc/",
         chain_id=42170,
         tx_type=2,
-        coin_symbol='ETH',
+        coin_symbol="ETH",
         decimals=18,
-        explorer='https://nova.arbiscan.io/',
+        explorer="https://nova.arbiscan.io/",
         api=API(
-            key=config.ARBITRUM_API_KEY, url='https://api-nova.arbiscan.io/api', docs='https://nova.arbiscan.io/apis/'
-        )
+            key=config.ARBITRUM_API_KEY,
+            url="https://api-nova.arbiscan.io/api",
+            docs="https://nova.arbiscan.io/apis/",
+        ),
     )
 
     Optimism = Network(
-        name='optimism',
-        rpc='https://rpc.ankr.com/optimism/',
+        name="optimism",
+        rpc="https://rpc.ankr.com/optimism/",
         chain_id=10,
         tx_type=2,
-        coin_symbol='ETH',
+        coin_symbol="ETH",
         decimals=18,
-        explorer='https://optimistic.etherscan.io/',
+        explorer="https://optimistic.etherscan.io/",
         api=API(
-            key=config.OPTIMISM_API_KEY, url='https://api-optimistic.etherscan.io/api',
-            docs='https://docs.optimism.etherscan.io/'
+            key=config.OPTIMISM_API_KEY,
+            url="https://api-optimistic.etherscan.io/api",
+            docs="https://docs.optimism.etherscan.io/",
         ),
     )
 
     BSC = Network(
-        name='bsc',
-        rpc='https://rpc.ankr.com/bsc/',
+        name="bsc",
+        rpc="https://rpc.ankr.com/bsc/",
         chain_id=56,
         tx_type=0,
-        coin_symbol='BNB',
+        coin_symbol="BNB",
         decimals=18,
-        explorer='https://bscscan.com/',
-        api=API(key=config.BSC_API_KEY, url='https://api.bscscan.com/api', docs='https://docs.bscscan.com/'),
+        explorer="https://bscscan.com/",
+        api=API(
+            key=config.BSC_API_KEY,
+            url="https://api.bscscan.com/api",
+            docs="https://docs.bscscan.com/",
+        ),
     )
 
     Polygon = Network(
-        name='polygon',
-        rpc='https://rpc.ankr.com/polygon/',
+        name="polygon",
+        rpc="https://rpc.ankr.com/polygon/",
         chain_id=137,
         tx_type=2,
-        coin_symbol='MATIC',
+        coin_symbol="MATIC",
         decimals=18,
-        explorer='https://polygonscan.com/',
+        explorer="https://polygonscan.com/",
         api=API(
-            key=config.POLYGON_API_KEY, url='https://api.polygonscan.com/api', docs='https://docs.polygonscan.com/'
+            key=config.POLYGON_API_KEY,
+            url="https://api.polygonscan.com/api",
+            docs="https://docs.polygonscan.com/",
         ),
     )
 
     Avalanche = Network(
-        name='avalanche',
-        rpc='https://rpc.ankr.com/avalanche/',
+        name="avalanche",
+        rpc="https://rpc.ankr.com/avalanche/",
         chain_id=43114,
         tx_type=2,
-        coin_symbol='AVAX',
+        coin_symbol="AVAX",
         decimals=18,
-        explorer='https://snowtrace.io/',
-        api=API(key=config.AVALANCHE_API_KEY, url='https://api.snowtrace.io/api', docs='https://docs.snowtrace.io/')
+        explorer="https://snowtrace.io/",
+        api=API(
+            key=config.AVALANCHE_API_KEY,
+            url="https://api.snowtrace.io/api",
+            docs="https://docs.snowtrace.io/",
+        ),
     )
 
     Moonbeam = Network(
-        name='moonbeam',
-        rpc='https://rpc.api.moonbeam.network/',
+        name="moonbeam",
+        rpc="https://rpc.api.moonbeam.network/",
         chain_id=1284,
         tx_type=2,
-        coin_symbol='GLMR',
+        coin_symbol="GLMR",
         decimals=18,
-        explorer='https://moonscan.io/',
+        explorer="https://moonscan.io/",
         api=API(
-            key=config.MOONBEAM_API_KEY, url='https://api-moonbeam.moonscan.io/api', docs='https://moonscan.io/apis/'
-        )
+            key=config.MOONBEAM_API_KEY,
+            url="https://api-moonbeam.moonscan.io/api",
+            docs="https://moonscan.io/apis/",
+        ),
     )
 
     Fantom = Network(
-        name='fantom',
-        rpc='https://fantom.publicnode.com',
+        name="fantom",
+        rpc="https://fantom.publicnode.com",
         chain_id=250,
         tx_type=0,
-        coin_symbol='FTM',
+        coin_symbol="FTM",
         decimals=18,
-        explorer='https://ftmscan.com/',
-        api=API(key=config.FANTOM_API_KEY, url='https://api.ftmscan.com/api', docs='https://docs.ftmscan.com/')
+        explorer="https://ftmscan.com/",
+        api=API(
+            key=config.FANTOM_API_KEY,
+            url="https://api.ftmscan.com/api",
+            docs="https://docs.ftmscan.com/",
+        ),
     )
 
     Celo = Network(
-        name='celo',
-        rpc='https://1rpc.io/celo',
+        name="celo",
+        rpc="https://1rpc.io/celo",
         chain_id=42220,
         tx_type=0,
-        coin_symbol='CELO',
+        coin_symbol="CELO",
         decimals=18,
-        explorer='https://celoscan.io/',
-        api=API(key=config.CELO_API_KEY, url='https://api.celoscan.io/api', docs='https://celoscan.io/apis/')
+        explorer="https://celoscan.io/",
+        api=API(
+            key=config.CELO_API_KEY,
+            url="https://api.celoscan.io/api",
+            docs="https://celoscan.io/apis/",
+        ),
     )
 
     ZkSync = Network(
-        name='zksync',
-        rpc='https://mainnet.era.zksync.io',
+        name="zksync",
+        rpc="https://mainnet.era.zksync.io",
         # rpc='https://rpc.ankr.com/zksync_era',
         chain_id=324,
         tx_type=2,
-        coin_symbol='ETH',
+        coin_symbol="ETH",
         decimals=18,
-        explorer='https://explorer.zksync.io/',
+        explorer="https://explorer.zksync.io/",
     )
 
     Gnosis = Network(
-        name='gnosis',
-        rpc='https://rpc.ankr.com/gnosis',
+        name="gnosis",
+        rpc="https://rpc.ankr.com/gnosis",
         chain_id=100,
         tx_type=2,
-        coin_symbol='xDAI',
+        coin_symbol="xDAI",
         decimals=18,
-        explorer='https://gnosisscan.io/',
-        api=API(key=config.GNOSIS_API_KEY, url='https://api.gnosisscan.io/api', docs='https://docs.gnosisscan.io/')
+        explorer="https://gnosisscan.io/",
+        api=API(
+            key=config.GNOSIS_API_KEY,
+            url="https://api.gnosisscan.io/api",
+            docs="https://docs.gnosisscan.io/",
+        ),
     )
 
     HECO = Network(
-        name='heco',
-        rpc='https://http-mainnet.hecochain.com',
+        name="heco",
+        rpc="https://http-mainnet.hecochain.com",
         chain_id=128,
         tx_type=2,
-        coin_symbol='HECO',
+        coin_symbol="HECO",
         decimals=18,
-        explorer='https://www.hecoinfo.com/en-us/',
-        api=API(key=config.HECO_API_KEY, url='https://api.hecoinfo.com/api', docs='https://hecoinfo.com/apis')
+        explorer="https://www.hecoinfo.com/en-us/",
+        api=API(
+            key=config.HECO_API_KEY,
+            url="https://api.hecoinfo.com/api",
+            docs="https://hecoinfo.com/apis",
+        ),
     )
 
     # Testnets
     Goerli = Network(
-        name='goerli',
-        rpc='https://rpc.ankr.com/eth_goerli/',
+        name="goerli",
+        rpc="https://rpc.ankr.com/eth_goerli/",
         chain_id=5,
         tx_type=2,
-        coin_symbol='ETH',
+        coin_symbol="ETH",
         decimals=18,
-        explorer='https://goerli.etherscan.io/',
+        explorer="https://goerli.etherscan.io/",
         api=API(
-            key=config.GOERLI_API_KEY, url='https://api-goerli.etherscan.io/api',
-            docs='https://docs.etherscan.io/v/goerli-etherscan/'
-        )
+            key=config.GOERLI_API_KEY,
+            url="https://api-goerli.etherscan.io/api",
+            docs="https://docs.etherscan.io/v/goerli-etherscan/",
+        ),
     )
 
     Sepolia = Network(
-        name='sepolia',
-        rpc='https://rpc.sepolia.org',
+        name="sepolia",
+        rpc="https://rpc.sepolia.org",
         chain_id=11155111,
         tx_type=2,
-        coin_symbol='ETH',
+        coin_symbol="ETH",
         decimals=18,
-        explorer='https://sepolia.etherscan.io',
+        explorer="https://sepolia.etherscan.io",
         api=API(
-            key=config.SEPOLIA_API_KEY, url='https://api-sepolia.etherscan.io/api',
-            docs='https://docs.etherscan.io/v/sepolia-etherscan/'
-        )
+            key=config.SEPOLIA_API_KEY,
+            url="https://api-sepolia.etherscan.io/api",
+            docs="https://docs.etherscan.io/v/sepolia-etherscan/",
+        ),
     )
 
 
@@ -378,11 +435,17 @@ class RawContract(AutoRepr):
         abi list[dict[str, Any]] | str: an ABI of the contract.
 
     """
+
     title: str
     address: ChecksumAddress
     abi: list[dict[str, ...]]
 
-    def __init__(self, address: str, abi: list[dict[str, ...]] | str | None = None, title: str = '') -> None:
+    def __init__(
+        self,
+        address: str,
+        abi: list[dict[str, ...]] | str | None = None,
+        title: str = "",
+    ) -> None:
         """
         Initialize the class.
 
@@ -407,9 +470,14 @@ class CommonValues:
     """
     An instance with common values used in transactions.
     """
-    Null: str = '0x0000000000000000000000000000000000000000000000000000000000000000'
-    InfinityStr: str = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
-    InfinityInt: int = int('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 16)
+
+    Null: str = "0x0000000000000000000000000000000000000000000000000000000000000000"
+    InfinityStr: str = (
+        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    )
+    InfinityInt: int = int(
+        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16
+    )
 
 
 class TxArgs(AutoRepr):

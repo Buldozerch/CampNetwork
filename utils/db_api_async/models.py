@@ -1,7 +1,8 @@
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Text, Boolean
+from sqlalchemy import Text, Boolean, DateTime
 import sqlalchemy as sa
+from datetime import datetime
 
 
 class Base(DeclarativeBase):
@@ -16,6 +17,9 @@ class User(Base):
     public_key: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     proxy: Mapped[str] = mapped_column(Text, nullable=True, unique=False)
     user_agent: Mapped[str] = mapped_column(Text, nullable=False, unique=False)
+    faucet_last_claim: Mapped[datetime] = mapped_column(
+        DateTime, nullable=True, default=None
+    )  # New column for last faucet claim
     completed_quests: Mapped[str] = mapped_column(
         Text, nullable=True, default=""
     )  # Просто строка с разделителями
