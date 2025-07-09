@@ -39,7 +39,7 @@ def print_logo():
     """Выводит логотип программы"""
     # Создаем более простую рамку с фиксированной шириной
     panel = Panel(
-        "[bold white]CAMP NETWORK FARMER[/bold white]\n\n"
+        "[bold white]CAMP NETWORK FARMER 2.0[/bold white]\n\n"
         "GitHub: [link]https://github.com/Buldozerch[/link]\n"
         "Channel: [link]https://t.me/buldozercode[/link]",
         width=60,
