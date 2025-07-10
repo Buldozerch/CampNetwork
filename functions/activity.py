@@ -1314,6 +1314,9 @@ async def process_wallet_with_specific_quests(
 
 
 async def handle_onchain(user: User):
+    if user.account_blocked:
+        logger.warning(f"{user} account Blocked skip")
+        return True
     settings = Settings()
     startup_min, startup_max = settings.get_wallet_startup_delay()
     delay = random.uniform(startup_min, startup_max)
@@ -1375,6 +1378,9 @@ async def handle_onchain(user: User):
 
 
 async def handle_faucet(user: User, make_delay: bool = False):
+    if user.account_blocked:
+        logger.warning(f"{user} account Blocked skip")
+        return True
     settings = Settings()
     if make_delay:
         startup_min, startup_max = settings.get_wallet_startup_delay()
