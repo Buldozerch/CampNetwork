@@ -45,10 +45,10 @@ class CampOnchain:
         base_camp_max_mint = 50
         aura_contract = await self.client.contracts.get(contract_address=Contracts.AURA)
         aura_max_mint = 50
-        cope_ville_contract = await self.client.contracts.get(
-            contract_address=Contracts.COPE_VILLE
+        sticky_pleb_contract = await self.client.contracts.get(
+            contract_address=Contracts.STICKY_PLEB
         )
-        cope_ville_max_mint = 1
+        sticky_pleb_max_mint = 1
         climb_contract = await self.client.contracts.get(
             contract_address=Contracts.CLIMB
         )
@@ -84,13 +84,13 @@ class CampOnchain:
                 else:
                     continue
 
-            elif mint == "cope_ville":
+            elif mint == "sticky_pleb":
                 need_mint, quantity = await self.need_mint_and_quantity(
-                    contract=cope_ville_contract, max_mint=cope_ville_max_mint
+                    contract=sticky_pleb_contract, max_mint=sticky_pleb_max_mint
                 )
                 if need_mint and quantity:
-                    await self.cope_ville_mint(
-                        contract=cope_ville_contract, quantity=quantity
+                    await self.sticky_pleb_mint(
+                        contract=sticky_pleb_contract, quantity=quantity
                     )
                 else:
                     continue
@@ -282,7 +282,7 @@ class CampOnchain:
         else:
             raise Exception(f"Mint failed: {result.error_message}")
 
-    async def cope_ville_mint(self, contract: AsyncContract, quantity: int = 1):
+    async def sticky_pleb_mint(self, contract: AsyncContract, quantity: int = 1):
         allowlist_proof_params = TxArgs(
             proof=[
                 "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -307,7 +307,7 @@ class CampOnchain:
 
         # Выполняем через TransactionExecutor
         result = await self.execute_transaction(
-            tx_params=tx_params, activity_type="Cope_ville_mint", retry_count=3
+            tx_params=tx_params, activity_type="Sticky_pleb_mint", retry_count=3
         )
 
         if result.success:

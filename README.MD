@@ -138,7 +138,7 @@ python main.py
 Список НФТ которые минтит:
 - Base Camp на Rarible
 - Aura
-- Cope Ville
+- Sticky Pleb
 - Climb
 - Pictographs
 - TokenTails

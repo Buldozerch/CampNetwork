@@ -67,7 +67,7 @@ ACTUAL_FOLLOWS_TWITTER = [
 ACTUAL_NFT_MINT = [
     "base_camp",
     "aura",
-    "cope_ville",
+    "sticky_pleb",
     "climb",
     "pictographs",
     "tokentails",
