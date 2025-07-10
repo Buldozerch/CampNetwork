@@ -2,7 +2,6 @@ from typing import Dict, List, Optional, Any
 import random
 from loguru import logger
 from utils.db_api_async.models import User
-from libs.eth_async.client import Client
 from libs.eth_async.data.models import Networks
 from website.referral_manager import load_ref_codes, get_referral_code_for_registration
 from data.models import Settings
@@ -13,7 +12,7 @@ from .quest_client import QuestClient
 class CampNetworkClient:
     """Основной клиент для CampNetwork, объединяющий авторизацию и работу с заданиями"""
 
-    def __init__(self, user: User, client: Optional[Client] = None):
+    def __init__(self, user: User):
         """
         Инициализация клиента CampNetwork
 

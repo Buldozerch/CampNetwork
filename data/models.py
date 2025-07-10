@@ -7,7 +7,9 @@ class Settings(Singleton, AutoRepr):
     def __init__(self):
         json_data = read_json(path=SETTINGS_FILE)
         self.use_ssl = json_data.get("use_ssl", True)
-        self.use_faucet = json_data.get("use_faucet", False)
+        self.use_faucet = json_data.get("onchain", {}).get("use_faucet", False)
+        self.multiple_mint = json_data.get("onchain", {}).get("multiple_mint", False)
+        self.random_mint = json_data.get("onchain", {}).get("random_mint", False)
         self.twitter_enabled = json_data.get("twitter", {}).get("enabled", True)
 
         self.twitter_delay_actions_min = (
@@ -71,6 +73,9 @@ class Settings(Singleton, AutoRepr):
 
     def get_use_faucet(self):
         return self.use_faucet
+
+    def get_onchain_settings(self):
+        return self.multiple_mint, self.random_mint
 
     def get_twitter_action_delay(self) -> tuple:
         """Возвращает диапазон задержки между действиями в Twitter"""

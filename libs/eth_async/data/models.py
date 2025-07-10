@@ -1,9 +1,10 @@
 import json
 from decimal import Decimal
 from dataclasses import dataclass
+from typing import Dict, Any, List, Optional, Union
 
 import requests
-from web3 import Web3
+from web3 import AsyncWeb3
 from eth_typing import ChecksumAddress
 
 from libs.eth_async import exceptions
@@ -13,6 +14,10 @@ from libs.eth_async.blockscan_api import APIFunctions
 
 
 class TokenAmount:
+    """
+    Класс для работы с количеством токенов.
+    """
+
     Wei: int
     Ether: Decimal
     decimals: int
@@ -20,6 +25,14 @@ class TokenAmount:
     def __init__(
         self, amount: int | float | str | Decimal, decimals: int = 18, wei: bool = False
     ) -> None:
+        """
+        Инициализирует класс TokenAmount.
+
+        Args:
+            amount: Количество токенов
+            decimals: Количество десятичных знаков токена
+            wei: True, если amount указан в wei (минимальных единицах токена)
+        """
         if wei:
             self.Wei: int = int(amount)
             self.Ether: Decimal = Decimal(str(amount)) / 10**decimals
@@ -33,9 +46,85 @@ class TokenAmount:
     def __str__(self):
         return f"{self.Wei}"
 
+    def __repr__(self):
+        return (
+            f"TokenAmount(Wei={self.Wei}, Ether={self.Ether}, decimals={self.decimals})"
+        )
+
+    def __eq__(self, other):
+        if isinstance(other, TokenAmount):
+            return self.Wei == other.Wei
+        return False
+
+    def __lt__(self, other):
+        if isinstance(other, TokenAmount):
+            return self.Wei < other.Wei
+        return NotImplemented
+
+    def __gt__(self, other):
+        if isinstance(other, TokenAmount):
+            return self.Wei > other.Wei
+        return NotImplemented
+
+    def __le__(self, other):
+        if isinstance(other, TokenAmount):
+            return self.Wei <= other.Wei
+        return NotImplemented
+
+    def __ge__(self, other):
+        if isinstance(other, TokenAmount):
+            return self.Wei >= other.Wei
+        return NotImplemented
+
+    def __add__(self, other):
+        if isinstance(other, TokenAmount):
+            if self.decimals != other.decimals:
+                raise ValueError(
+                    f"Cannot add TokenAmount with different decimals: {self.decimals} and {other.decimals}"
+                )
+            return TokenAmount(
+                amount=self.Wei + other.Wei, decimals=self.decimals, wei=True
+            )
+        return NotImplemented
+
+    def __sub__(self, other):
+        if isinstance(other, TokenAmount):
+            if self.decimals != other.decimals:
+                raise ValueError(
+                    f"Cannot subtract TokenAmount with different decimals: {self.decimals} and {other.decimals}"
+                )
+            return TokenAmount(
+                amount=self.Wei - other.Wei, decimals=self.decimals, wei=True
+            )
+        return NotImplemented
+
+    def __mul__(self, other):
+        if isinstance(other, (int, float, Decimal)):
+            return TokenAmount(
+                amount=int(self.Wei * other), decimals=self.decimals, wei=True
+            )
+        return NotImplemented
+
+    def __truediv__(self, other):
+        if isinstance(other, (int, float, Decimal)):
+            return TokenAmount(
+                amount=int(self.Wei / other), decimals=self.decimals, wei=True
+            )
+        if isinstance(other, TokenAmount):
+            if self.decimals != other.decimals:
+                raise ValueError(
+                    f"Cannot divide TokenAmount with different decimals: {self.decimals} and {other.decimals}"
+                )
+            return self.Wei / other.Wei
+        return NotImplemented
+
 
 @dataclass
 class DefaultABIs:
+    """
+    Класс с дефолтными ABI для токенов и других контрактов.
+    """
+
     Token = [
         {
             "constant": True,
@@ -120,18 +209,114 @@ class DefaultABIs:
         },
     ]
 
+    # ABI для NFT (ERC-721)
+    NFT = [
+        {
+            "constant": True,
+            "inputs": [{"name": "owner", "type": "address"}],
+            "name": "balanceOf",
+            "outputs": [{"name": "balance", "type": "uint256"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [{"name": "tokenId", "type": "uint256"}],
+            "name": "ownerOf",
+            "outputs": [{"name": "owner", "type": "address"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "constant": False,
+            "inputs": [
+                {"name": "to", "type": "address"},
+                {"name": "tokenId", "type": "uint256"},
+            ],
+            "name": "transfer",
+            "outputs": [],
+            "payable": False,
+            "stateMutability": "nonpayable",
+            "type": "function",
+        },
+        {
+            "constant": False,
+            "inputs": [
+                {"name": "to", "type": "address"},
+                {"name": "tokenId", "type": "uint256"},
+            ],
+            "name": "safeTransferFrom",
+            "outputs": [],
+            "payable": False,
+            "stateMutability": "nonpayable",
+            "type": "function",
+        },
+        {
+            "constant": False,
+            "inputs": [
+                {"name": "to", "type": "address"},
+                {"name": "approved", "type": "bool"},
+            ],
+            "name": "setApprovalForAll",
+            "outputs": [],
+            "payable": False,
+            "stateMutability": "nonpayable",
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [
+                {"name": "owner", "type": "address"},
+                {"name": "operator", "type": "address"},
+            ],
+            "name": "isApprovedForAll",
+            "outputs": [{"name": "approved", "type": "bool"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [],
+            "name": "name",
+            "outputs": [{"name": "", "type": "string"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [{"name": "", "type": "string"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
+        },
+        {
+            "constant": True,
+            "inputs": [{"name": "tokenId", "type": "uint256"}],
+            "name": "tokenURI",
+            "outputs": [{"name": "", "type": "string"}],
+            "payable": False,
+            "stateMutability": "view",
+            "type": "function",
+        },
+    ]
+
 
 @dataclass
 class API:
     """
-    An instance that contains an API related information.
+    Класс с информацией об API блокчейн-сканера.
 
     Attributes:
-        key (str): an API-key.
-        url (str): an API entrypoint URL.
-        docs (str): a docs URL.
-        functions (Optional[APIFunctions]): the functions instance.
-
+        key (str): API ключ.
+        url (str): URL входной точки API.
+        docs (str): URL документации.
+        functions (Optional[APIFunctions]): Инстанс функций API.
     """
 
     key: str
@@ -141,6 +326,10 @@ class API:
 
 
 class Network:
+    """
+    Класс, представляющий сеть Ethereum.
+    """
+
     def __init__(
         self,
         name: str,
@@ -152,6 +341,19 @@ class Network:
         explorer: str | None = None,
         api: API | None = None,
     ) -> None:
+        """
+        Инициализирует класс Network.
+
+        Args:
+            name: Название сети
+            rpc: RPC URL
+            decimals: Количество десятичных знаков нативной монеты
+            chain_id: Chain ID сети
+            tx_type: Тип транзакций (0 - Legacy, 2 - EIP-1559)
+            coin_symbol: Символ нативной монеты
+            explorer: URL блокчейн-сканера
+            api: Инстанс API
+        """
         self.name: str = name.lower()
         self.rpc: str = rpc
         self.chain_id: int | None = chain_id
@@ -160,11 +362,11 @@ class Network:
         self.explorer: str | None = explorer
         self.decimals = decimals
         self.api = api
-        # todo: добавить поле decimals
 
         if not self.chain_id:
             try:
-                self.chain_id = Web3(Web3.HTTPProvider(self.rpc)).eth.chain_id
+                web3 = AsyncWeb3(AsyncWeb3.AsyncHTTPProvider(self.rpc))
+                self.chain_id = AsyncWeb3.to_sync_loop(web3.eth.chain_id)
             except Exception as err:
                 raise exceptions.WrongChainID(f"Can not get chain id: {err}")
 
@@ -179,9 +381,9 @@ class Network:
                         network = network_
                         break
 
-                if not self.coin_symbol:
+                if not self.coin_symbol and network:
                     self.coin_symbol = network["nativeCurrency"]["symbol"]
-                if not self.decimals:
+                if not self.decimals and network:
                     self.decimals = int(network["nativeCurrency"]["decimals"])
 
             except Exception as err:
@@ -194,17 +396,24 @@ class Network:
 
     def set_api_functions(self) -> None:
         """
-        Update API functions after API key change.
+        Обновляет функции API после изменения API ключа.
         """
         if self.api and self.api.key and self.api.url:
             self.api.functions = APIFunctions(self.api.key, self.api.url)
 
+    def __repr__(self) -> str:
+        return f"Network(name='{self.name}', chain_id={self.chain_id})"
+
 
 class Networks:
+    """
+    Класс со списком доступных сетей.
+    """
+
     # Mainnets
     Ethereum = Network(
         name="ethereum",
-        rpc="https://eth.drpc.org",
+        rpc="https://1rpc.io/eth",
         chain_id=1,
         tx_type=2,
         coin_symbol="ETH",
@@ -219,7 +428,7 @@ class Networks:
 
     Arbitrum = Network(
         name="arbitrum",
-        rpc="https://rpc.ankr.com/arbitrum/",
+        rpc="https://1rpc.io/arb",
         chain_id=42161,
         tx_type=2,
         coin_symbol="ETH",
@@ -249,7 +458,7 @@ class Networks:
 
     Optimism = Network(
         name="optimism",
-        rpc="https://rpc.ankr.com/optimism/",
+        rpc="https://0xrpc.io/op",
         chain_id=10,
         tx_type=2,
         coin_symbol="ETH",
@@ -264,7 +473,7 @@ class Networks:
 
     BSC = Network(
         name="bsc",
-        rpc="https://rpc.ankr.com/bsc/",
+        rpc="https://1rpc.io/bnb",
         chain_id=56,
         tx_type=0,
         coin_symbol="BNB",
@@ -279,7 +488,7 @@ class Networks:
 
     Polygon = Network(
         name="polygon",
-        rpc="https://rpc.ankr.com/polygon/",
+        rpc="https://1rpc.io/matic",
         chain_id=137,
         tx_type=2,
         coin_symbol="MATIC",
@@ -294,7 +503,7 @@ class Networks:
 
     Avalanche = Network(
         name="avalanche",
-        rpc="https://rpc.ankr.com/avalanche/",
+        rpc="https://1rpc.io/avax/c",
         chain_id=43114,
         tx_type=2,
         coin_symbol="AVAX",
@@ -355,7 +564,6 @@ class Networks:
     ZkSync = Network(
         name="zksync",
         rpc="https://mainnet.era.zksync.io",
-        # rpc='https://rpc.ankr.com/zksync_era',
         chain_id=324,
         tx_type=2,
         coin_symbol="ETH",
@@ -365,7 +573,7 @@ class Networks:
 
     Gnosis = Network(
         name="gnosis",
-        rpc="https://rpc.ankr.com/gnosis",
+        rpc="https://1rpc.io/gnosis",
         chain_id=100,
         tx_type=2,
         coin_symbol="xDAI",
@@ -378,21 +586,135 @@ class Networks:
         ),
     )
 
-    HECO = Network(
-        name="heco",
-        rpc="https://http-mainnet.hecochain.com",
-        chain_id=128,
+    Base = Network(
+        name="base",
+        rpc="https://0xrpc.io/base",
+        chain_id=8453,
         tx_type=2,
-        coin_symbol="HECO",
+        coin_symbol="ETH",
         decimals=18,
-        explorer="https://www.hecoinfo.com/en-us/",
+        explorer="https://basescan.org/",
         api=API(
-            key=config.HECO_API_KEY,
-            url="https://api.hecoinfo.com/api",
-            docs="https://hecoinfo.com/apis",
+            key=config.BASE_API_KEY,
+            url="https://api.basescan.org/api",
+            docs="https://docs.basescan.org/",
         ),
     )
 
+    Linea = Network(
+        name="linea",
+        rpc="https://rpc.linea.build",
+        chain_id=59144,
+        tx_type=2,
+        coin_symbol="ETH",
+        decimals=18,
+        explorer="https://lineascan.build/",
+        api=API(
+            key=config.LINEA_API_KEY,
+            url="https://api.lineascan.build/api",
+            docs="https://docs.lineascan.build/",
+        ),
+    )
+
+    Mode = Network(
+        name="mode",
+        rpc="https://1rpc.io/mode",
+        chain_id=34443,
+        tx_type=2,
+        coin_symbol="ETH",
+        decimals=18,
+        explorer="https://modescan.io/",
+        api=API(
+            key=config.MODE_API_KEY,
+            url="https://modescan.io/",
+            docs="https://modescan.io/documentation/etherscan-compatibility",
+        ),
+    )
+
+    Soneium = Network(
+        name="soneium",
+        rpc="https://rpc.soneium.org",
+        chain_id=1868,
+        tx_type=2,
+        coin_symbol="ETH",
+        decimals=18,
+        explorer="https://soneium.blockscout.com/",
+        api=API(
+            key=config.SONEIUM_API_KEY,
+            url="https://soneium.blockscout.com/",
+            docs="https://soneium.blockscout.com/api-docs",
+        ),
+    )
+
+    Ink = Network(
+        name="ink",
+        rpc="https://rpc-qnd.inkonchain.com",
+        chain_id=57073,
+        tx_type=2,
+        coin_symbol="ETH",
+        decimals=18,
+        explorer="https://explorer.inkonchain.com/",
+        api=API(
+            key=config.INK_API_KEY,
+            url="https://explorer.inkonchain.com/",
+            docs="https://explorer.inkonchain.com/api-docs",
+        ),
+    )
+
+    Unichain = Network(
+        name="unichain",
+        rpc="https://unichain.drpc.org",
+        chain_id=130,
+        tx_type=2,
+        coin_symbol="ETH",
+        decimals=18,
+        explorer="https://uniscan.xyz/",
+        api=API(
+            key=config.UNICHAIN_API_KEY,
+            url="https://uniscan.xyz/",
+            docs="https://docs.uniscan.xyz/",
+        ),
+    )
+
+    Lisk = Network(
+        name="lisk",
+        rpc="https://rpc.api.lisk.com",
+        chain_id=1135,
+        tx_type=2,
+        coin_symbol="ETH",
+        decimals=18,
+        explorer="https://blockscout.lisk.com/",
+        api=API(
+            key=config.LISK_API_KEY,
+            url="https://blockscout.lisk.com/",
+            docs="https://blockscout.lisk.com/api-docs",
+        ),
+    )
+
+    Camp = Network(
+        name="camp",
+        rpc="https://rpc.basecamp.t.raas.gelato.cloud",
+        chain_id=123420001114,
+        tx_type=2,
+        coin_symbol="CAMP",
+        decimals=18,
+        explorer="https://basecamp.cloud.blockscout.com",
+        api=API(
+            key=config.EXAMPLE_API_KEY,
+            url="https://basecamp.cloud.blockscout.com",
+            docs="https://basecamp.cloud.blockscout.com",
+        ),
+    )
+    Example = Network(
+        name="",
+        rpc="",
+        chain_id=5,
+        tx_type=2,
+        coin_symbol="",
+        decimals=18,
+        explorer="",
+        api=API(key=config.EXAMPLE_API_KEY, url="", docs=""),
+    )
     # Testnets
     Goerli = Network(
         name="goerli",
@@ -411,7 +733,7 @@ class Networks:
 
     Sepolia = Network(
         name="sepolia",
-        rpc="https://rpc.sepolia.org",
+        rpc="https://1rpc.io/sepolia",
         chain_id=11155111,
         tx_type=2,
         coin_symbol="ETH",
@@ -427,13 +749,12 @@ class Networks:
 
 class RawContract(AutoRepr):
     """
-    An instance of a raw contract.
+    Класс, представляющий сырой контракт.
 
     Attributes:
-        title str: a contract title.
-        address (ChecksumAddress): a contract address.
-        abi list[dict[str, Any]] | str: an ABI of the contract.
-
+        title str: Название контракта.
+        address (ChecksumAddress): Адрес контракта.
+        abi list[dict[str, Any]] | str: ABI контракта.
     """
 
     title: str
@@ -447,16 +768,15 @@ class RawContract(AutoRepr):
         title: str = "",
     ) -> None:
         """
-        Initialize the class.
+        Инициализирует класс.
 
         Args:
-            title (str): a contract title.
-            address (str): a contract address.
-            abi (Union[List[Dict[str, Any]], str]): an ABI of the contract.
-
+            title (str): Название контракта.
+            address (str): Адрес контракта.
+            abi (Union[List[Dict[str, Any]], str]): ABI контракта.
         """
         self.title = title
-        self.address = Web3.to_checksum_address(address)
+        self.address = AsyncWeb3.to_checksum_address(address)
         self.abi = json.loads(abi) if isinstance(abi, str) else abi
 
     def __eq__(self, other) -> bool:
@@ -468,7 +788,7 @@ class RawContract(AutoRepr):
 @dataclass
 class CommonValues:
     """
-    An instance with common values used in transactions.
+    Класс с общими значениями для транзакций.
     """
 
     Null: str = "0x0000000000000000000000000000000000000000000000000000000000000000"
@@ -478,39 +798,37 @@ class CommonValues:
     InfinityInt: int = int(
         "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff", 16
     )
+    ZeroAddress: str = "0x0000000000000000000000000000000000000000"
 
 
 class TxArgs(AutoRepr):
     """
-    An instance for named transaction arguments.
+    Класс для именованных аргументов транзакции.
     """
 
     def __init__(self, **kwargs) -> None:
         """
-        Initialize the class.
+        Инициализирует класс.
 
         Args:
-            **kwargs: named arguments of a contract transaction.
-
+            **kwargs: Именованные аргументы транзакции контракта.
         """
         self.__dict__.update(kwargs)
 
     def list(self) -> list[...]:
         """
-        Get list of transaction arguments.
+        Получает список аргументов транзакции.
 
         Returns:
-            List[Any]: list of transaction arguments.
-
+            List[Any]: Список аргументов транзакции.
         """
         return list(self.__dict__.values())
 
     def tuple(self) -> tuple[str, ...]:
         """
-        Get tuple of transaction arguments.
+        Получает кортеж аргументов транзакции.
 
         Returns:
-            Tuple[Any]: tuple of transaction arguments.
-
+            Tuple[Any]: Кортеж аргументов транзакции.
         """
         return tuple(self.__dict__.values())

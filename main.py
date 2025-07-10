@@ -7,6 +7,7 @@ from functions.activity import (
     complete_specific_quests,
     check_all_wallets_blocked,
     all_faucet_claim,
+    start_onchain,
 )
 
 from utils.db_api_async.db_api import Session
@@ -648,13 +649,14 @@ def print_menu():
     menu.add_row("1)", "Импорт кошельков в базу данных")
     menu.add_row("2)", "Выполнить все задания")
     menu.add_row("3)", "Выполнить выбранные задания")
-    menu.add_row("4)", "Показать статистику")
-    menu.add_row("5)", "Управление ресурсами")  # Новый пункт меню
-    menu.add_row("6)", "Управление реферальными кодами")  # Новый пункт меню
-    menu.add_row("7)", "Настройки")
-    menu.add_row("8)", "Проверить кошельки на блокировку")
-    menu.add_row("9)", "Выполнить Faucet")
-    menu.add_row("10)", "Выход")
+    menu.add_row("4)", "Выполнить Onchain Mints")
+    menu.add_row("5)", "Выполнить Faucet")
+    menu.add_row("6)", "Показать статистику")
+    menu.add_row("7)", "Управление ресурсами")  # Новый пункт меню
+    menu.add_row("8)", "Управление реферальными кодами")  # Новый пункт меню
+    menu.add_row("9)", "Настройки")
+    menu.add_row("10)", "Проверить кошельки на блокировку")
+    menu.add_row("11)", "Выход")
 
     console.print(menu)
 
@@ -718,34 +720,40 @@ async def main():
                 input()
 
             elif action == "4":
+                await start_onchain()
+                console.print("[bold green]Нажмите Enter для продолжения...[/]")
+                input()
+
+            elif action == "5":
+                await all_faucet_claim()
+                console.print("[bold green]Нажмите Enter для продолжения...[/]")
+                input()
+
+            elif action == "6":
                 # Показать статистику
                 console.print("\n[bold cyan]Получение статистики...[/]")
                 await get_wallets_stats()
                 console.print("[bold green]Нажмите Enter для продолжения...[/]")
                 input()
 
-            elif action == "5":
+            elif action == "7":
                 # Управление ресурсами (новая опция)
                 await option_manage_resources()
 
-            elif action == "6":
+            elif action == "8":
                 # Управление реферальными кодами (новая опция)
                 await option_manage_refcodes()
 
-            elif action == "7":
+            elif action == "9":
                 # Настройки
                 await option_update_settings()
                 sys.exit(0)
 
-            elif action == "8":
+            elif action == "10":
                 await check_all_wallets_blocked()
                 sys.exit(0)
 
-            elif action == "9":
-                await all_faucet_claim()
-                sys.exit(0)
-
-            elif action == "10":
+            elif action == "11":
                 # Выход
                 console.print("\n[bold cyan]Выход из программы[/]")
                 sys.exit(0)

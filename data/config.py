@@ -12,6 +12,7 @@ else:
     ROOT_DIR = Path(__file__).parent.parent.absolute()
 
 FILES_DIR = os.path.join(ROOT_DIR, "files")
+ABIS_DIR = os.path.join(ROOT_DIR, "abis")
 
 CAPMONSTER_API_KEY = os.getenv("CAPMONSTER_API_KEY")
 SOLVECAPTCHA_API_KEY = os.getenv("SOLVECAPTCHA_API_KEY")
@@ -63,6 +64,14 @@ ACTUAL_FOLLOWS_TWITTER = [
     "StoryChain_ai",
 ]
 
+ACTUAL_NFT_MINT = [
+    "base_camp",
+    "aura",
+    "cope_ville",
+    "climb",
+    "pictographs",
+    "tokentails",
+]
 LOG_FILE = os.path.join(FILES_DIR, "log.log")
 ERRORS_FILE = os.path.join(FILES_DIR, "errors.log")
 

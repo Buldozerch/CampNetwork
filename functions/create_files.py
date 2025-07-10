@@ -40,7 +40,11 @@ def create_files():
 
     settings = {
         "use_ssl": True,
-        "use_faucet": False,
+        "onchain": {
+            "use_faucet": True,
+            "multiple_mint": False,
+            "random_mint": False,
+        },
         # Twitter настройки
         "twitter": {
             "enabled": True,
