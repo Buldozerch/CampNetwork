@@ -1332,7 +1332,9 @@ async def handle_onchain(user: User):
     balance = 0
     for _ in range(max_failures):
         try:
+            logger.debug(f"{user} start check balance in Camp")
             balance = await client.wallet.balance()
+            logger.debug(f"{user} balance in Camp {balance}")
             await client.close()
             break
         except Exception as e:
@@ -1363,7 +1365,9 @@ async def handle_onchain(user: User):
                             )
                             return False
     if balance == 0 and settings.use_faucet:
+        logger.debug(f"{user} start use Faucet")
         faucet = await handle_faucet(user=user)
+        logger.debug(f"{user} end use Faucet")
         if not faucet:
             return False
     if balance == 0 and not settings.use_faucet:
@@ -1371,6 +1375,7 @@ async def handle_onchain(user: User):
             f"{user} don't have balance for mint and use_faucet disabled in settings"
         )
         return False
+    logger.debug(f"{user} start Onchain")
     onchain = CampOnchain(user=user)
     await onchain.handle_mint()
     logger.info(f"{user} Onchain Work Done!")
