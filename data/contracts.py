@@ -20,8 +20,8 @@ class Contracts(Singleton):
         abi=read_json(path=(ABIS_DIR, "rarible.json")),
     )
 
-    COPE_VILLE = RawContract(
-        title="COPE_VILLE",
+    STICKY_PLEB = RawContract(
+        title="STICKY_PLEB",
         address="0x0d7516f4A6823F6F11a8F1C292E5DF1A6fF5775b",
         abi=read_json(path=(ABIS_DIR, "rarible.json")),
     )
