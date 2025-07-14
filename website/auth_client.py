@@ -247,8 +247,8 @@ class AuthClient(BaseHttpClient):
         # Формируем данные формы для запроса
         form_data = {
             "message": json.dumps(message),
-            "accessToken": signature,
-            "signature": signature,
+            "accessToken": "0x" + signature,
+            "signature": "0x" + signature,
             "walletConnectorName": "Rabby",
             "walletAddress": self.user.public_key,
             "redirect": "false",
