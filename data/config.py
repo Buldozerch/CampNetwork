@@ -27,7 +27,7 @@ RESERVE_PROXY_FILE = os.path.join(FILES_DIR, "reserve_proxy.txt")
 RESERVE_TWITTER_FILE = os.path.join(FILES_DIR, "reserve_twitter.txt")
 
 SETTINGS_FILE = os.path.join(FILES_DIR, "settings.json")
-ACTUAL_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
+ACTUAL_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 ACTUAL_FOLLOWS_TWITTER = [
     "MySphereAI",
     "pets_ww",
