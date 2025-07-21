@@ -128,6 +128,7 @@ class BaseHttpClient:
         extra_cookies: bool = False,
         allow_redirects: bool = True,
         check_cloudflare: bool = True,  # Флаг для проверки Cloudflare защиты
+        quest_id: str | None = None,
     ) -> Tuple[bool, Union[Dict, str]]:
         """
         Выполняет HTTP-запрос с автоматической обработкой капчи и ошибок прокси
@@ -159,6 +160,9 @@ class BaseHttpClient:
             "timeout": timeout,
             "allow_redirects": allow_redirects,
         }
+        if quest_id:
+            cookie_str = "rule-" + quest_id
+            self.cookies[cookie_str] = "true"
         if not extra_cookies:
             self.cookies["accountLinkData"] = ""
         if not extra_cookies and self.cookies.get("__cf_bm"):

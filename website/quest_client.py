@@ -263,6 +263,7 @@ class QuestClient(BaseHttpClient):
                 method="POST",
                 json_data={},  # Пустой JSON как в curl-запросах
                 headers=headers,
+                quest_id=quest_id,
             )
 
             if success:
