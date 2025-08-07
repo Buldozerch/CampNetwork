@@ -89,15 +89,8 @@ class CampOnchain:
                     continue
 
             elif mint == "mintpad":
-                need_mint, quantity = await self.need_mint_and_quantity(
-                    contract=mintpad_contract, max_mint=mintpad_max_mint
-                )
-                if need_mint and quantity:
-                    await self.mintpad_mint(
-                        contract=mintpad_contract
-                    )
-                else:
-                    continue
+                await self.mintpad_mint(
+                        contract=mintpad_contract)
 
             elif mint == "tavern_quest":
                 need_mint, quantity = await self.need_mint_and_quantity(
