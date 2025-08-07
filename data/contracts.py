@@ -42,3 +42,21 @@ class Contracts(Singleton):
         address="0xa0D4687483F049c53e6EC8cBCbc0332C74180168",
         abi=read_json(path=(ABIS_DIR, "tokenTails.json")),
     )
+
+    OMNI_HUB = RawContract(
+        title="OMNI_HUB",
+        address="0x29248D49a64Df624fecC543624beaB16904d0F3f",
+        abi=read_json(path=(ABIS_DIR, "rarible.json")),
+    )
+
+    TAVERN_QUEST = RawContract(
+        title="TAVERN_QUEST",
+        address="0x294246b7353081763BF57e05D827816Cec4B9093",
+        abi=read_json(path=(ABIS_DIR, "rarible.json")),
+    )
+
+    MINT_PAD = RawContract(
+        title="MINT_PAD",
+        address="0x00000000009a1E02f00E280dcfA4C81c55724212",
+        abi=read_json(path=(ABIS_DIR, "rarible.json")),
+    )

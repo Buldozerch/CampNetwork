@@ -29,41 +29,25 @@ RESERVE_TWITTER_FILE = os.path.join(FILES_DIR, "reserve_twitter.txt")
 SETTINGS_FILE = os.path.join(FILES_DIR, "settings.json")
 ACTUAL_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 ACTUAL_FOLLOWS_TWITTER = [
-    "MySphereAI",
-    "pets_ww",
-    "blocsocial_",
-    "campnetworkxyz",
-    "clustersxyz",
-    "PictographsNFT",
-    "arcoin_official",
-    "entertainm_io",
-    "bleetz_io",
-    "xade_xyz",
-    "summitx_finance",
-    "OrbiMatrix",
-    "rapier_xyz",
-    "olympicsdotfun",
-    "weepingplebs",
-    "TheMetakraft",
-    "thepixudi",
-    "ScorePlay_xyz",
-    "tokentails",
-    "rarible",
-    "ConftApp",
-    "arkivist_ai",
-    "cheb_inc",
-    "awanalab",
-    "onbd_art",
-    "Fantasy_cristal",
-    "PanenkaFC90",
-    "xross__road",
-    "reblapp",
-    "merv_wtf",
-    "merv_toon",
-    "chronicle_ww",
-    "StoryChain_ai",
+    "campnetworkeco"
+    "campnetworkxyz"
+    "WEARETRaiLHEADS"
+    "ativ_official"
+    "chainbills_xyz"
+    "rgbclash_xyz"
+    "PlayFlappyTrump"
+    "0xhighnoon"
+    "relicquest"
+    "blackmirror_xp"
+    "korprotocol"
+    "mighty_study"
+    "mintpadco"
+    "Omni_Hub"
+    "PlenaFinance"
+    "rupturelabs"
+    "HairyLabs"
+    "ChikoGames_"
 ]
-
 ACTUAL_NFT_MINT = [
     "base_camp",
     "aura",
@@ -71,6 +55,9 @@ ACTUAL_NFT_MINT = [
     "climb",
     "pictographs",
     "tokentails",
+    "omnihub_mint",
+    "tavern_quest",
+    "mintpad",
 ]
 LOG_FILE = os.path.join(FILES_DIR, "log.log")
 ERRORS_FILE = os.path.join(FILES_DIR, "errors.log")

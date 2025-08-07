@@ -6,7 +6,7 @@ from data.config import ACTUAL_NFT_MINT
 from libs.eth_async import TokenAmount
 from web3.constants import MAX_INT
 from data.models import Settings
-from web3.contract import AsyncContract
+from web3.contract import AsyncContract, Contract
 from web3.types import TxParams
 from typing import Dict, Optional, Any, Union
 from loguru import logger
@@ -37,8 +37,8 @@ class CampOnchain:
         )
 
     async def handle_mint(self):
-        settings = Settings()
-        start_delay, end_delay = settings.get_quest_delay()
+        start_delay = self.settings.random_pause_between_actions_min
+        end_delay = self.settings.random_pause_between_actions_max
         base_camp_contract = await self.client.contracts.get(
             contract_address=Contracts.BASE_CAMP
         )
@@ -56,13 +56,26 @@ class CampOnchain:
         pictographs_contract = await self.client.contracts.get(
             contract_address=Contracts.PICTOGRAPHS
         )
-
         pictographs_max_mint = 1
+        token_tails_max_mint = 1
         token_tails_contract = await self.client.contracts.get(
             contract_address=Contracts.TOKEN_TAILS
         )
-        token_tails_max_mint = 1
-        actual_nft_mint = random.sample(ACTUAL_NFT_MINT, len(ACTUAL_NFT_MINT))
+
+        omnihub_max_mint = 1
+        omnihub_contract = await self.client.contracts.get(
+            contract_address=Contracts.OMNI_HUB
+        )
+
+        tavern_quest_max_mint = 1
+        tavern_quest_contract = await self.client.contracts.get(
+            contract_address=Contracts.TAVERN_QUEST
+        )
+        mintpad_max_mint = 1
+        mintpad_contract = await self.client.contracts.get(
+            contract_address=Contracts.MINT_PAD
+        )
+        actual_nft_mint = random.sample(self.settings.onchain_actions, len(self.settings.onchain_actions))
         for mint in actual_nft_mint:
             if mint == "base_camp":
                 need_mint, quantity = await self.need_mint_and_quantity(
@@ -71,6 +84,39 @@ class CampOnchain:
                 if need_mint and quantity:
                     await self.base_camp_mint(
                         contract=base_camp_contract, quantity=quantity
+                    )
+                else:
+                    continue
+
+            elif mint == "mintpad":
+                need_mint, quantity = await self.need_mint_and_quantity(
+                    contract=mintpad_contract, max_mint=mintpad_max_mint
+                )
+                if need_mint and quantity:
+                    await self.mintpad_mint(
+                        contract=mintpad_contract
+                    )
+                else:
+                    continue
+
+            elif mint == "tavern_quest":
+                need_mint, quantity = await self.need_mint_and_quantity(
+                    contract=tavern_quest_contract, max_mint=tavern_quest_max_mint
+                )
+                if need_mint and quantity:
+                    await self.tavern_quest_mint(
+                        contract=tavern_quest_contract
+                    )
+                else:
+                    continue
+
+            elif mint == "omnihub_mint":
+                need_mint, quantity = await self.need_mint_and_quantity(
+                    contract=omnihub_contract, max_mint=omnihub_max_mint
+                )
+                if need_mint and quantity:
+                    await self.omnihub_mint(
+                        contract=omnihub_contract
                     )
                 else:
                     continue
@@ -123,10 +169,9 @@ class CampOnchain:
                     continue
 
             sleep_time = random.randint(start_delay, end_delay)
-            logger.info(f"{self.user} sleep before next Mint {sleep_time} seconds")
+            logger.info(f"{self.user} pausing for {sleep_time} seconds before next mint")
             await asyncio.sleep(sleep_time)
-        logger.success(f"{self.user} all NFT Minted")
-        await self.client.close()
+        logger.success(f"{self.user} all NFTs minted successfully")
         return True
 
     async def _check_balance(
@@ -378,6 +423,54 @@ class CampOnchain:
         # Выполняем через TransactionExecutor
         result = await self.execute_transaction(
             tx_params=tx_params, activity_type="token_tails_mint", retry_count=3
+        )
+
+        if result.success:
+            return result.tx_hash
+        else:
+            raise Exception(f"Mint failed: {result.error_message}")
+
+    async def omnihub_mint(self, contract: AsyncContract | Contract):
+        # Get contract and encode data
+        data = "0xa25ffea800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000"
+
+        tx_params = TxParams(to=contract.address, data=data, value=TokenAmount(amount=100000000000000, wei=True).Wei)
+
+        # Execute via TransactionExecutor
+        result = await self.execute_transaction(
+            tx_params=tx_params, activity_type="omnihub_mint", retry_count=3
+        )
+
+        if result.success:
+            return result.tx_hash
+        else:
+            raise Exception(f"Mint failed: {result.error_message}")
+
+    async def tavern_quest_mint(self, contract: AsyncContract | Contract):
+        # Get contract and encode data
+        data = "0xba41b0c6000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000"
+
+        tx_params = TxParams(to=contract.address, data=data)
+
+        # Execute via TransactionExecutor
+        result = await self.execute_transaction(
+            tx_params=tx_params, activity_type="tavern_quest_mint", retry_count=3
+        )
+
+        if result.success:
+            return result.tx_hash
+        else:
+            raise Exception(f"Mint failed: {result.error_message}")
+
+    async def mintpad_mint(self, contract: AsyncContract | Contract):
+        # Get contract and encode data
+        data = f"0xb510391f000000000000000000000000ac6f313c90c5a4c38811766ff09b4394921f853800000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000044449a52f8000000000000000000000000{self.client.account.address[2:]}000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000"
+
+        tx_params = TxParams(to=contract.address, data=data, value=TokenAmount(amount=6660000000, wei=True).Wei)
+
+        # Execute via TransactionExecutor
+        result = await self.execute_transaction(
+            tx_params=tx_params, activity_type="mintpad_mint", retry_count=3
         )
 
         if result.success:
