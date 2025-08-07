@@ -37,8 +37,8 @@ class CampOnchain:
         )
 
     async def handle_mint(self):
-        start_delay = self.settings.random_pause_between_actions_min
-        end_delay = self.settings.random_pause_between_actions_max
+        settings = Settings()
+        start_delay, end_delay = settings.get_quest_delay()
         base_camp_contract = await self.client.contracts.get(
             contract_address=Contracts.BASE_CAMP
         )
@@ -75,7 +75,7 @@ class CampOnchain:
         mintpad_contract = await self.client.contracts.get(
             contract_address=Contracts.MINT_PAD
         )
-        actual_nft_mint = random.sample(self.settings.onchain_actions, len(self.settings.onchain_actions))
+        actual_nft_mint = random.sample(ACTUAL_NFT_MINT, len(ACTUAL_NFT_MINT))
         for mint in actual_nft_mint:
             if mint == "base_camp":
                 need_mint, quantity = await self.need_mint_and_quantity(
