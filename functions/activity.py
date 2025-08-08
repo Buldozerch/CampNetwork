@@ -46,6 +46,15 @@ if os.path.exists(twitter_file):
 else:
     twitter = []
 
+reserve_twitter_file = config.RESERVE_TWITTER_FILE
+if os.path.exists(reserve_twitter_file):
+    with open(reserve_twitter_file, "r") as reserve_twitter_file:
+        reserve_twitter = [
+            line.strip() for line in reserve_twitter_file if line.strip()
+        ]
+else:
+    reserve_twitter = []
+
 
 async def add_wallets_db():
     """Импортирует кошельки в базу данных"""
@@ -112,7 +121,9 @@ async def process_wallet(wallet: User):
     max_retries = 3
     retry_count = 0
 
-    twitter_enabled = settings.twitter_enabled and wallet.twitter_token is not None
+    twitter_enabled = (
+        settings.twitter_enabled and wallet.twitter_token is not None
+    ) or (settings.twitter_enabled and reserve_twitter)
 
     # Получаем список незавершенных заданий
     async with Session() as session:
@@ -231,7 +242,7 @@ async def process_wallet(wallet: User):
             # Проверяем, включен ли Twitter
             twitter_enabled = (
                 settings.twitter_enabled and wallet.twitter_token is not None
-            )
+            ) or (settings.twitter_enabled and reserve_twitter)
 
             # Получаем список незавершенных заданий
             async with Session() as session:
@@ -1105,7 +1116,7 @@ async def process_wallet_with_specific_quests(
             # Проверяем, включен ли Twitter
             twitter_enabled = (
                 settings.twitter_enabled and wallet.twitter_token is not None
-            )
+            ) or (settings.twitter_enabled and reserve_twitter)
 
             # Разделяем задания на обычные и Twitter
             regular_quests = []
@@ -1858,9 +1869,7 @@ async def get_wallets_stats():
                 twitter_health = (
                     "OK"
                     if wallet.twitter_status == "OK"
-                    else "Blocked"
-                    if wallet.twitter_status == "BAD"
-                    else "Bad"
+                    else "Blocked" if wallet.twitter_status == "BAD" else "Bad"
                 )
 
                 stats[wallet.public_key] = {
@@ -1885,9 +1894,11 @@ async def get_wallets_stats():
         # Сортируем кошельки по количеству выполненных заданий (по убыванию)
         sorted_wallets = sorted(
             stats.keys(),
-            key=lambda k: stats[k].get("completed_count", 0)
-            if "error" not in stats[k] and not stats[k].get("blocked", False)
-            else -1,
+            key=lambda k: (
+                stats[k].get("completed_count", 0)
+                if "error" not in stats[k] and not stats[k].get("blocked", False)
+                else -1
+            ),
             reverse=True,
         )
 
