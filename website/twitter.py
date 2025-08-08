@@ -97,6 +97,7 @@ class TwitterClient(BaseHttpClient):
         self.last_error = None
         self.error_count = 0
         self.settings = Settings()
+        self.twitter_username = None
 
     async def initialize(self) -> bool:
         """
@@ -537,6 +538,7 @@ class TwitterClient(BaseHttpClient):
                         twitter_verified_at = user_metadata.get("twitterVerifiedAt")
 
                         if twitter_user and twitter_verified_at:
+                            self.twitter_username = twitter_user
                             logger.success(
                                 f"{self.user} Twitter уже подключен (@{twitter_user})"
                             )
@@ -959,6 +961,22 @@ class TwitterClient(BaseHttpClient):
                 else:
                     logger.error(
                         f"{self.user} не удалось инициализировать Twitter клиент"
+                    )
+                    return False
+
+            if self.twitter_username and self.twitter_account.username != self.twitter_username:
+                logger.warning(f"{self.user} twitter nickname {self.twitter_account.username} not same one connected to Camp {self.twitter_username} try reconnect")
+                await self.disconnect_twitter()
+                connect_success = (
+                    await self.connect_twitter_to_camp()
+                )
+                if connect_success:
+                    logger.success(
+                        f"{self.user} успешная реинициализация с новым токеном Twitter"
+                    )
+                else:
+                    logger.error(
+                        f"{self.user} не удалось подключить Twitter с новым токеном"
                     )
                     return False
 
